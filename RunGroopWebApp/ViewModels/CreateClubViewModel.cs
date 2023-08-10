@@ -1,5 +1,6 @@
 ﻿using RunGroopWebApp.Data.Enum;
 using RunGroopWebApp.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace RunGroopWebApp.ViewModels
 {
