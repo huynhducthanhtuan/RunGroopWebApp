@@ -18,18 +18,21 @@ namespace RunGroopWebApp.Controllers
             _photoService = photoService;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             IEnumerable<Race> races = await _raceRepository.GetAllRaces();
             return View(races);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {
             Race race = await _raceRepository.GetRaceById(id);
             return View(race);
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -48,7 +51,6 @@ namespace RunGroopWebApp.Controllers
                     Description = newRace.Description,
                     Image = result.Url.ToString(),
                     RaceCategory = newRace.RaceCategory,
-                    // AppUserId = newRace.AppUserId,
                     Address = new Address
                     {
                         Street = newRace.Address.Street,
@@ -65,6 +67,68 @@ namespace RunGroopWebApp.Controllers
             }
 
             return View(newRace);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var race = await _raceRepository.GetRaceByIdNoTracking(id);
+
+            if (race == null) return View("Error");
+
+            var oldRace = new EditRaceViewModel
+            {
+                Title = race.Title,
+                Description = race.Description,
+                RaceCategory = race.RaceCategory,
+                AddressId = race.AddressId,
+                Address = race.Address,
+            };
+            return View(oldRace);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, EditRaceViewModel newRace)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Failed to edit club");
+                return View("Edit", newRace);
+            }
+
+            var race = await _raceRepository.GetRaceByIdNoTracking(id);
+
+            if (race == null)
+            {
+                return View("Error");
+            }
+
+            var photoResult = await _photoService.AddPhotoAsync(newRace.Image);
+
+            if (photoResult.Error != null)
+            {
+                ModelState.AddModelError("Image", "Photo upload failed");
+                return View(newRace);
+            }
+
+            if (!string.IsNullOrEmpty(race.Image))
+            {
+                _ = _photoService.DeletePhotoAsync(race.Image);
+            }
+
+            var updateRace = new Race
+            {
+                Id = id,
+                Title = newRace.Title,
+                Description = newRace.Description,
+                Image = photoResult.Url.ToString(),
+                AddressId = newRace.AddressId,
+                Address = newRace.Address,
+            };
+
+            _raceRepository.Update(updateRace);
+
+            return RedirectToAction("Index");
         }
     }
 }
