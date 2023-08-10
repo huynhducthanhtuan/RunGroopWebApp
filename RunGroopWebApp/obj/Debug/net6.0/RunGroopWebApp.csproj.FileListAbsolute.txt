@@ -176,3 +176,4 @@ C:\Users\tuanh\source\repos\.NETCOREWEBMVC\RunGroopWebApp\RunGroopWebApp\obj\Deb
 C:\Users\tuanh\source\repos\.NETCOREWEBMVC\RunGroopWebApp\RunGroopWebApp\obj\Debug\net6.0\RunGroopWebApp.pdb
 C:\Users\tuanh\source\repos\.NETCOREWEBMVC\RunGroopWebApp\RunGroopWebApp\obj\Debug\net6.0\RunGroopWebApp.genruntimeconfig.cache
 C:\Users\tuanh\source\repos\.NETCOREWEBMVC\RunGroopWebApp\RunGroopWebApp\obj\Debug\net6.0\ref\RunGroopWebApp.dll
+C:\Users\tuanh\source\repos\.NETCOREWEBMVC\RunGroopWebApp\RunGroopWebApp\bin\Debug\net6.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
