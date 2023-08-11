@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RunGroopWebApp.Helpers;
 using RunGroopWebApp.Interfaces;
 using RunGroopWebApp.Models;
 using RunGroopWebApp.ViewModels;
@@ -9,11 +10,17 @@ namespace RunGroopWebApp.Controllers
     {
         private readonly IClubRepository _clubRepository;
         private readonly IPhotoService _photoService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ClubController(IClubRepository clubRepository, IPhotoService photoService)
+        public ClubController(
+            IClubRepository clubRepository,
+            IPhotoService photoService,
+            IHttpContextAccessor httpContextAccessor
+        )
         {
             _clubRepository = clubRepository;
             _photoService = photoService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -33,7 +40,12 @@ namespace RunGroopWebApp.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            var createClubViewModel = new CreateClubViewModel()
+            {
+                AppUserId = userId
+            };
+            return View(createClubViewModel);
         }
 
         [HttpPost]
@@ -54,7 +66,8 @@ namespace RunGroopWebApp.Controllers
                         Street = newClub.Address.Street,
                         City = newClub.Address.City,
                         State = newClub.Address.State,
-                    }
+                    },
+                    AppUserId = newClub.AppUserId
                 };
                 _clubRepository.Add(club);
                 return RedirectToAction("Index");

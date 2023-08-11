@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RunGroopWebApp.Helpers;
 using RunGroopWebApp.Interfaces;
 using RunGroopWebApp.Models;
 using RunGroopWebApp.Repositories;
@@ -11,11 +12,17 @@ namespace RunGroopWebApp.Controllers
     {
         private readonly IRaceRepository _raceRepository;
         private readonly IPhotoService _photoService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public RaceController(IRaceRepository raceRepository, IPhotoService photoService)
+        public RaceController(
+            IRaceRepository raceRepository, 
+            IPhotoService photoService,
+            IHttpContextAccessor httpContextAccessor
+        )
         {
             _raceRepository = raceRepository;
             _photoService = photoService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -35,7 +42,12 @@ namespace RunGroopWebApp.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            var createRaceViewModel = new CreateRaceViewModel()
+            {
+                AppUserId = userId
+            };
+            return View(createRaceViewModel);
         }
 
         [HttpPost]
@@ -56,7 +68,8 @@ namespace RunGroopWebApp.Controllers
                         Street = newRace.Address.Street,
                         City = newRace.Address.City,
                         State = newRace.Address.State,
-                    }
+                    },
+                    AppUserId = newRace.AppUserId
                 };
                 _raceRepository.Add(race);
                 return RedirectToAction("Index");
