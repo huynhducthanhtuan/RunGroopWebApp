@@ -2,8 +2,6 @@
 using RunGroopWebApp.Helpers;
 using RunGroopWebApp.Interfaces;
 using RunGroopWebApp.Models;
-using RunGroopWebApp.Repositories;
-using RunGroopWebApp.Services;
 using RunGroopWebApp.ViewModels;
 
 namespace RunGroopWebApp.Controllers

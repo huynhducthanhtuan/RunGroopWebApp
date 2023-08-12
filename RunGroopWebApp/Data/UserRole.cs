@@ -1,6 +1,6 @@
 ﻿namespace RunGroopWebApp.Data
 {
-    public class UserRoles
+    public class UserRole
     {
         public const string Admin = "admin";
         public const string User = "user";

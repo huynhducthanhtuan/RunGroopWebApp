@@ -125,10 +125,10 @@ namespace RunGroopWebApp.Data
                 // Roles
                 var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-                if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
-                    await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
-                if (!await roleManager.RoleExistsAsync(UserRoles.User))
-                    await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+                if (!await roleManager.RoleExistsAsync(UserRole.Admin))
+                    await roleManager.CreateAsync(new IdentityRole(UserRole.Admin));
+                if (!await roleManager.RoleExistsAsync(UserRole.User))
+                    await roleManager.CreateAsync(new IdentityRole(UserRole.User));
 
                 // Users
                 var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
@@ -150,7 +150,7 @@ namespace RunGroopWebApp.Data
                         }
                     };
                     await userManager.CreateAsync(newAdminUser, "Coding@1234?");
-                    await userManager.AddToRoleAsync(newAdminUser, UserRoles.Admin);
+                    await userManager.AddToRoleAsync(newAdminUser, UserRole.Admin);
                 }
 
                 string appUserEmail = "user@etickets.com";
@@ -171,7 +171,7 @@ namespace RunGroopWebApp.Data
                         }
                     };
                     await userManager.CreateAsync(newAppUser, "Coding@1234?");
-                    await userManager.AddToRoleAsync(newAppUser, UserRoles.User);
+                    await userManager.AddToRoleAsync(newAppUser, UserRole.User);
                 }
             }
         }
