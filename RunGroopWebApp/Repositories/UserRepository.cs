@@ -1,4 +1,5 @@
-﻿using RunGroopWebApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using RunGroopWebApp.Data;
 using RunGroopWebApp.Interfaces;
 using RunGroopWebApp.Models;
 using RunGroopWebApp.ViewModels;
@@ -14,35 +15,22 @@ namespace RunGroopWebApp.Repositories
             _context = context;
         }
 
-        public async Task<List<UserViewModel>> GetAllUsers()
+        public async Task<List<AppUser>> GetAllUsers()
         {
-            List<AppUser> users = _context.Users.ToList();
-            List<UserViewModel> userViewModels = new List<UserViewModel>();
-            foreach (var user in users)
-            {
-                UserViewModel userViewModel = new UserViewModel()
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Pace = user.Pace,
-                    Mileage = user.Mileage,
-                };
-                userViewModels.Add(userViewModel);
-            }
-            return userViewModels;
+            return _context.Users.ToList();
         }
 
-        public async Task<UserDetailViewModel> GetUserById(string id)
+        public async Task<AppUser> GetUserById(string id)
         {
-            AppUser user = _context.Users.Find(id);
-            UserDetailViewModel userDetailViewModel = new UserDetailViewModel()
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                Pace = user.Pace,
-                Mileage = user.Mileage,
-            };
-            return userDetailViewModel;
+            return _context.Users.Find(id);
+        }
+
+        public async Task<AppUser> GetUserByIdNoTracking(string id)
+        {
+            return _context.Users
+                .Where(u => u.Id == id)
+                .AsNoTracking()
+                .FirstOrDefault();
         }
 
         public bool Add(AppUser user)
