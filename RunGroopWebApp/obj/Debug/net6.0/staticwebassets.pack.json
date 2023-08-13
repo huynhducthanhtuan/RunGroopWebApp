@@ -13,6 +13,10 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\js\\common.js",
+      "PackagePath": "staticwebassets\\js\\common.js"
+    },
+    {
       "Id": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },

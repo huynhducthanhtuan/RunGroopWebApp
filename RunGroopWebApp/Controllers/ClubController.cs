@@ -141,5 +141,15 @@ namespace RunGroopWebApp.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            Club club = await _clubRepository.GetClubById(id);
+            if (club == null) return View("Error");
+
+            _clubRepository.Delete(club);
+            return RedirectToAction("Index");
+        }
     }
 }

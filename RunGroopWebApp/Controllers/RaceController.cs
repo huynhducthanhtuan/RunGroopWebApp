@@ -2,6 +2,7 @@
 using RunGroopWebApp.Helpers;
 using RunGroopWebApp.Interfaces;
 using RunGroopWebApp.Models;
+using RunGroopWebApp.Repositories;
 using RunGroopWebApp.ViewModels;
 
 namespace RunGroopWebApp.Controllers
@@ -139,6 +140,16 @@ namespace RunGroopWebApp.Controllers
 
             _raceRepository.Update(updateRace);
 
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            Race race = await _raceRepository.GetRaceById(id);
+            if (race == null) return View("Error");
+
+            _raceRepository.Delete(race);
             return RedirectToAction("Index");
         }
     }

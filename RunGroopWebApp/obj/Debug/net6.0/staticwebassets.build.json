@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "jS9IoWJPggxh/cn8zI90A4M7KoCfuRhopTswpMAR0ko=",
+  "Hash": "sniqUrHGGuiuXcAR9H6B95uxqvxa+jLz205hAZfqlD0=",
   "Source": "RunGroopWebApp",
   "BasePath": "_content/RunGroopWebApp",
   "Mode": "Default",
@@ -83,6 +83,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\js\\common.js",
+      "SourceId": "RunGroopWebApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\",
+      "BasePath": "_content/RunGroopWebApp",
+      "RelativePath": "js/common.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\common.js"
     },
     {
       "Identity": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\js\\site.js",
