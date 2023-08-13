@@ -34,6 +34,11 @@ namespace RunGroopWebApp.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             Club club = await _clubRepository.GetClubById(id);
+            if (club == null)
+            {
+                TempData["Error"] = "This club is not found!";
+                return View("Error");
+            }
             return View(club);
         }
 

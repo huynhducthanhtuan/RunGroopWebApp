@@ -9,6 +9,6 @@ function closeModal(modalId) {
 }
 
 function triggerClickButton(buttonId) {
-    var submitButton = document.getElementById(buttonId);
-    submitButton.click();
+    var button = document.getElementById(buttonId);
+    button.click();
 }

@@ -13,6 +13,18 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\img\\banner.png",
+      "PackagePath": "staticwebassets\\img\\banner.png"
+    },
+    {
+      "Id": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\img\\default-avatar.jpg",
+      "PackagePath": "staticwebassets\\img\\default-avatar.jpg"
+    },
+    {
+      "Id": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\img\\slider.jpg",
+      "PackagePath": "staticwebassets\\img\\slider.jpg"
+    },
+    {
       "Id": "C:\\Users\\tuanh\\source\\repos\\.NETCOREWEBMVC\\RunGroopWebApp\\RunGroopWebApp\\wwwroot\\js\\common.js",
       "PackagePath": "staticwebassets\\js\\common.js"
     },

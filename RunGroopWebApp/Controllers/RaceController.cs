@@ -35,6 +35,11 @@ namespace RunGroopWebApp.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             Race race = await _raceRepository.GetRaceById(id);
+            if (race == null)
+            {
+                TempData["Error"] = "This race is not found!";
+                return View("Error");
+            }
             return View(race);
         }
 
