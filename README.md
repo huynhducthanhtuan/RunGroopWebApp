@@ -2,8 +2,6 @@
 
 ##### Practice ASP.NET Core Web MVC (.NET 6.0) Project
 
----
-
 <details><summary><b>Installation Guide</b></summary>
 
 #### 1. Clone repository
@@ -54,8 +52,6 @@ string url = "https://ipinfo.io?token=IPInfo-Token";
 
 </details>
 
----
-
 <details><summary><b>Exception</b></summary>
 
 ##### If Step 2 fails, you can do it manually like this
@@ -83,8 +79,6 @@ dotnet run seeddata
 ```
 
 </details>
-
----
 
 ### Reference Resources
 
