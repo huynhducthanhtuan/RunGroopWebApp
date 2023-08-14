@@ -10,11 +10,11 @@
 git clone https://github.com/huynhducthanhtuan/practice-nestjs-typescript.git
 ```
 
-#### 2. Import SQL Server database from RunGroups.bak file
+#### 2. Import SQL Server database from `RunGroups.bak` file
 
 #### 3. Update SQL Server database connection string
 
-**appsettings.json**
+`appsettings.json`
 
 ```bash
 "ConnectionStrings": {
@@ -22,11 +22,11 @@ git clone https://github.com/huynhducthanhtuan/practice-nestjs-typescript.git
 }
 ```
 
-##### Change "THANHTUAN" with your computer name
+##### Change `THANHTUAN` with your computer name
 
 #### 4. Register [Cloudinary](https://cloudinary.com/) account and update Cloudinary config
 
-**appsettings.json**
+`appsettings.json`
 
 ```bash
 "CloudinarySetting": {
@@ -40,36 +40,35 @@ git clone https://github.com/huynhducthanhtuan/practice-nestjs-typescript.git
 
 #### 5. Register [IPInfo](https://ipinfo.io/) account and update IPInfo token in API URL
 
-**Controllers/HomeController.cs**
+`Controllers/HomeController.cs`
 
 ```bash
 string url = "https://ipinfo.io?token=IPInfo-Token";
-}
 ```
 
-##### Change "IPInfo-Token" with your IPInfo token
+##### Change `IPInfo-Token` with your IPInfo token
 
 #### 6. Run project
 
-#### Exception
+### Exception
 
 ##### If step 2 is failed, you can do it manually like this
 
-##### 1. Create SQL Server database named "RunGroups"
+##### Create SQL Server database named `RunGroups`
 
-##### 2. Add Migration (Open Package Manager Console)
+##### Add Migration (Open Package Manager Console)
 
 ```bash
 Add-Migration Initialize
 ```
 
-##### 3. Update Database (Open Package Manager Console)
+##### Update Database (Open Package Manager Console)
 
 ```bash
 Update-Database
 ```
 
-##### 4. Seed Data (Open Terminal)
+##### Seed Data (Open Terminal)
 
 ```bash
 dotnet run seeddata
