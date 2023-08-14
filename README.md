@@ -2,7 +2,9 @@
 
 ##### Practice ASP.NET Core Web MVC (.NET 6.0) Project
 
-### Installation Guide
+---
+
+<details><summary><b>Installation Guide</b></summary>
 
 #### 1. Clone repository
 
@@ -50,11 +52,17 @@ string url = "https://ipinfo.io?token=IPInfo-Token";
 
 #### 6. Run project
 
-### Exception
+</details>
 
-##### If step 2 is failed, you can do it manually like this
+---
+
+<details><summary><b>Exception</b></summary>
+
+##### If Step 2 fails, you can do it manually like this
 
 ##### Create SQL Server database named `RunGroups`
+
+##### Update SQL Server database connection string (Step 3)
 
 ##### Add Migration (Open Package Manager Console)
 
@@ -73,6 +81,10 @@ Update-Database
 ```bash
 dotnet run seeddata
 ```
+
+</details>
+
+---
 
 ### Reference Resources
 
