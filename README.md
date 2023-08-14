@@ -1,4 +1,79 @@
-## Practice ASP.NET Core Web MVC (.NET 6.0)
+## RunGroup
+
+##### Practice ASP.NET Core Web MVC (.NET 6.0) Project
+
+### Installation Guide
+
+#### 1. Clone repository
+
+```bash
+git clone https://github.com/huynhducthanhtuan/practice-nestjs-typescript.git
+```
+
+#### 2. Import SQL Server database from RunGroups.bak file
+
+#### 3. Update SQL Server database connection string
+
+**appsettings.json**
+
+```bash
+"ConnectionStrings": {
+  "DefaultConnection": "Data Source=THANHTUAN;Initial Catalog=RunGroups;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"
+}
+```
+
+##### Change "THANHTUAN" with your computer name
+
+#### 4. Register [Cloudinary](https://cloudinary.com/) account and update Cloudinary config
+
+**appsettings.json**
+
+```bash
+"CloudinarySetting": {
+  "CloudName": "",
+  "ApiKey": "",
+  "ApiSecret": ""
+}
+```
+
+##### Update above config with your Cloudinary config
+
+#### 5. Register [IPInfo](https://ipinfo.io/) account and update IPInfo token in API URL
+
+**Controllers/HomeController.cs**
+
+```bash
+string url = "https://ipinfo.io?token=IPInfo-Token";
+}
+```
+
+##### Change "IPInfo-Token" with your IPInfo token
+
+#### 6. Run project
+
+#### Exception
+
+##### If step 2 is failed, you can do it manually like this
+
+##### 1. Create SQL Server database named "RunGroups"
+
+##### 2. Add Migration (Open Package Manager Console)
+
+```bash
+Add-Migration Initialize
+```
+
+##### 3. Update Database (Open Package Manager Console)
+
+```bash
+Update-Database
+```
+
+##### 4. Seed Data (Open Terminal)
+
+```bash
+dotnet run seeddata
+```
 
 ### Reference Resources
 
