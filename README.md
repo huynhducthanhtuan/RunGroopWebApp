@@ -94,7 +94,7 @@ docker build -t rungroup-image -f Dockerfile .
 docker run rungroup-image
 ```
 
-###### Change `rungroup-image` with your image name
+##### Change `rungroup-image` with your image name
 
 </details>
 
