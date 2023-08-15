@@ -1,6 +1,6 @@
 ## RunGroup
 
-### Practice ASP.NET Core Web MVC (.NET 6.0) Project
+##### An online platform for runners who can find clubs, schedule events, and meet other runners in your area.
 
 <details><summary><b>Installation Guide</b></summary>
 
