@@ -1,6 +1,6 @@
 ## RunGroup
 
-##### Practice ASP.NET Core Web MVC (.NET 6.0) Project
+### Practice ASP.NET Core Web MVC (.NET 6.0) Project
 
 <details><summary><b>Installation Guide</b></summary>
 
