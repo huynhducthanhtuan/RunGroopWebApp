@@ -1,6 +1,14 @@
-## RunGroup
+## RunGroup WebApp
 
-### Practice ASP.NET Core Web MVC (.NET 6.0) Project
+An online platform for runners who can find clubs, events, and meet other runners in your area.
+
+<details><summary><b>Prerequisites</b></summary>
+
+#### 1. .NET 6.0 SDK
+
+#### 2. [Visual Studio 2022](https://visualstudio.microsoft.com/vs/community/)
+
+</details>
 
 <details><summary><b>Installation Guide</b></summary>
 
@@ -48,31 +56,39 @@ string url = "https://ipinfo.io?token=IPInfo-Token";
 
 ##### Change `IPInfo-Token` with your IPInfo token
 
-#### 6. Run project
+#### 6. Run project (Visual Studio UI or Terminal)
+
+```bash
+dotnet build
+```
+
+```bash
+dotnet run
+```
 
 </details>
 
 <details><summary><b>Exception when backup database</b></summary>
 
-##### If Step 2 fails, you can do it manually like this
+##### If Step 2 of Installation Guide fails, you can do it manually like this
 
-##### Create SQL Server database named `RunGroups`
+##### 1. Create SQL Server database named `RunGroups`
 
-##### Update SQL Server database connection string (Step 3)
+##### 2. Update SQL Server database connection string (Step 3 - Installation Guide)
 
-##### Add Migration (Open Package Manager Console)
+##### 3. Add Migration (Open Package Manager Console)
 
 ```bash
 Add-Migration Initialize
 ```
 
-##### Update Database (Open Package Manager Console)
+##### 4. Update Database (Open Package Manager Console)
 
 ```bash
 Update-Database
 ```
 
-##### Seed Data (Open Terminal)
+##### 5. Seed Data (Open Terminal)
 
 ```bash
 dotnet run seeddata
@@ -82,13 +98,13 @@ dotnet run seeddata
 
 <details><summary><b>Run on Docker</b></summary>
 
-##### Build an image
+##### 1. Build an image
 
 ```bash
 docker build -t rungroup-image -f Dockerfile .
 ```
 
-##### Run image
+##### 2. Run image
 
 ```bash
 docker run rungroup-image
