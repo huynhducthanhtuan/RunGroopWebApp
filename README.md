@@ -1,6 +1,5 @@
 ## RunGroup
-
-##### An online platform for runners who can find clubs, schedule events, and meet other runners in your area.
+#### An online platform for runners who can find clubs, schedule events, and meet other runners in your area.
 
 <details><summary><b>Installation Guide</b></summary>
 
