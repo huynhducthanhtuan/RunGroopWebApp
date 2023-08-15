@@ -1,6 +1,6 @@
 ## RunGroup
 
-##### Practice ASP.NET Core Web MVC (.NET 6.0) Project
+### Practice ASP.NET Core Web MVC (.NET 6.0) Project
 
 <details><summary><b>Installation Guide</b></summary>
 
@@ -52,7 +52,7 @@ string url = "https://ipinfo.io?token=IPInfo-Token";
 
 </details>
 
-<details><summary><b>Exception</b></summary>
+<details><summary><b>Exception when backup database</b></summary>
 
 ##### If Step 2 fails, you can do it manually like this
 
@@ -80,10 +80,30 @@ dotnet run seeddata
 
 </details>
 
+<details><summary><b>Run on Docker</b></summary>
+
+##### Build an image
+
+```bash
+docker build -t rungroup-image -f Dockerfile .
+```
+
+##### Run image
+
+```bash
+docker run rungroup-image
+```
+
+##### Change `rungroup-image` with your image name
+
+</details>
+
 ### Reference Resources
 
 [ASP.NET Core MVC Course](https://www.youtube.com/playlist?list=PL82C6-O4XrHde_urqhKJHH-HTUfTK6siO/)
 
-[RunGroup Repository](https://github.com/teddysmithdev/RunGroop/)
+[Deploy ASP.NET web app to Azure](https://learn.microsoft.com/en-us/azure/app-service/quickstart-dotnetcore?tabs=net70&pivots=development-environment-vs)
 
-[ChatGPT](https://chat.openai.com/)
+[Dockerize a .NET app](https://learn.microsoft.com/en-us/dotnet/core/docker/build-container?tabs=windows)
+
+[RunGroup Repository](https://github.com/teddysmithdev/RunGroop/)
