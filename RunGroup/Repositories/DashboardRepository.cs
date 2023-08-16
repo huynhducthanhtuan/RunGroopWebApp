@@ -1,4 +1,6 @@
-﻿using RunGroup.Data;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using RunGroup.Data;
 using RunGroup.Helpers;
 using RunGroup.Interfaces;
 using RunGroup.Models;
@@ -7,30 +9,66 @@ namespace RunGroup.Repositories
 {
     public class DashboardRepository : IDashboardRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private string connectionString;
 
         public DashboardRepository(
-            ApplicationDbContext context,
+            IConfiguration configuration, 
             IHttpContextAccessor httpContextAccessor
         )
         {
-            _context = context;
+            _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<List<Club>> GetAllUserClubs()
+        public async Task<IEnumerable<Club>> GetAllUserClubs()
         {
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            var clubs = _context.Clubs.Where(c => c.AppUserId == userId).ToList();
-            return clubs;
+            string sql =
+                @"SELECT c.Id, Title, Description, Image, ClubCategory
+                FROM Clubs AS c
+                LEFT JOIN Addresses AS a ON c.AddressId = a.Id
+                WHERE c.AppUserId = @id";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string userId = _httpContextAccessor.HttpContext.User.GetUserId();
+                    IEnumerable<Club> clubs = connection.Query<Club>(sql, new { id = userId });
+                    return clubs;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
-        public async Task<List<Race>> GetAllUserRaces()
+        public async Task<IEnumerable<Race>> GetAllUserRaces()
         {
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            var races = _context.Races.Where(r => r.AppUserId == userId).ToList();
-            return races;
+            string sql =
+                @"SELECT r.Id, Title, Description, Image, RaceCategory
+                FROM Races AS r
+                LEFT JOIN Addresses AS a ON r.AddressId = a.Id
+                WHERE r.AppUserId = @id";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string userId = _httpContextAccessor.HttpContext.User.GetUserId();
+                    IEnumerable<Race> races = connection.Query<Race>(sql, new { id = userId });
+                    return races;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
     }
 }

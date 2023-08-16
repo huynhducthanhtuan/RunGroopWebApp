@@ -63,7 +63,7 @@ namespace RunGroup.Repositories
         public async Task<IEnumerable<Race>> GetRacesByCity(string city)
         {
             string sql =
-                @"SELECT r.Id, Title, Description, Image, ClubCategory
+                @"SELECT r.Id, Title, Description, Image, RaceCategory
                 FROM Races AS r
                 LEFT JOIN Addresses AS a ON r.AddressId = a.Id
                 WHERE a.City = @city";
