@@ -1,16 +1,15 @@
 ﻿using RunGroup.Models;
+using RunGroup.ViewModels;
 
 namespace RunGroup.Interfaces
 {
     public interface IRaceRepository
     {
         Task<IEnumerable<Race>> GetAllRaces();
-        Task<Race> GetRaceById(int id);
-        Task<Race> GetRaceByIdNoTracking(int id);
+        Task<RaceViewModel> GetRaceById(int id);
         Task<IEnumerable<Race>> GetRacesByCity(string city);
-        bool Add(Race race);
-        bool Update(Race race);
-        bool Delete(Race race);
-        bool Save();
+        Task<bool> Add(Race race);
+        Task<bool> Update(Race race);
+        Task<bool> Delete(int id);
     }
 }

@@ -2,13 +2,13 @@
 
 namespace RunGroup.ViewModels
 {
-    public class ClubViewModel
+    public class RaceViewModel
     {
         public int Id { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
         public string? Image { get; set; }
-        public ClubCategory ClubCategory { get; set; }
+        public RaceCategory RaceCategory { get; set; }
         public int? AddressId { get; set; }
         public string? AddressStreet { get; set; }
         public string? AddressCity { get; set; }

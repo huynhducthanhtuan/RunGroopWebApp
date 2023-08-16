@@ -1,69 +1,172 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RunGroup.Data;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using RunGroup.Interfaces;
 using RunGroup.Models;
+using RunGroup.ViewModels;
 
 namespace RunGroup.Repositories
 {
     public class RaceRepository : IRaceRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private string connectionString;
 
-        public RaceRepository(ApplicationDbContext context) 
-        { 
-            _context = context;
+        public RaceRepository(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task<IEnumerable<Race>> GetAllRaces()
         {
-            return await _context.Races.ToListAsync();
+            string sql = "SELECT * FROM Races";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    IEnumerable<Race> races = connection.Query<Race>(sql).ToList();
+                    return races;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
-        public async Task<Race> GetRaceById(int id)
+        public async Task<RaceViewModel> GetRaceById(int id)
         {
-            return await _context.Races
-                .Include(r => r.Address)
-                .FirstOrDefaultAsync(r => r.Id == id);
-        }
+            string sql =
+                @"SELECT r.Id, Title, Description, Image, RaceCategory, a.Id AS AddressId, 
+                        Street AS AddressStreet, City AS AddressCity, State AS AddressState
+                FROM Races AS r
+                LEFT JOIN Addresses AS a ON r.AddressId = a.Id
+                WHERE r.Id = @id";
 
-        public async Task<Race> GetRaceByIdNoTracking(int id)
-        {
-            return await _context.Races
-                .Include(r => r.Address)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == id);
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    RaceViewModel race = connection.QueryFirstOrDefault<RaceViewModel>(sql, new { id = id });
+                    return race;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
         public async Task<IEnumerable<Race>> GetRacesByCity(string city)
         {
-            return await _context.Races
-                .Include(r => r.Address)
-                .Where(r => r.Address.City == city)
-                .ToListAsync();
+            string sql =
+                @"SELECT r.Id, Title, Description, Image, ClubCategory
+                FROM Races AS r
+                LEFT JOIN Addresses AS a ON r.AddressId = a.Id
+                WHERE a.City = @city";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    IEnumerable<Race> races = connection.Query<Race>(sql, new { city = city });
+                    return races;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
-        public bool Add(Race race)
+        public async Task<bool> Add(Race race)
         {
-            _context.Add(race);
-            return Save();
+            string insertAddressSql = @"INSERT INTO Addresses (Street, City, State)
+                                        VALUES (@Street, @City, @State);
+                                        SELECT CAST(SCOPE_IDENTITY() as int)";
+
+            string insertRaceSql = @"INSERT INTO Races (Title, Description, Image, RaceCategory, AddressId, AppUserId)
+                                     VALUES (@Title, @Description, @Image, @RaceCategory, @AddressId, @AppUserId)";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    // Insert Address & get inserted Address Id
+                    int addressId = await connection.ExecuteScalarAsync<int>(insertAddressSql, race.Address);
+
+                    // If insert fail
+                    if (addressId == 0) return false;
+
+                    race.AddressId = addressId;
+
+                    // Insert Race
+                    int effectedRows = await connection.ExecuteAsync(insertRaceSql, race);
+                    return effectedRows == 1 ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
 
-        public bool Update(Race race)
+        public async Task<bool> Update(Race race)
         {
-            _context.Update(race);
-            return Save();
+            string updateAddressSql = @"UPDATE Addresses 
+                                        SET Street=@Street, City=@City, State=@State 
+                                        WHERE Id=@Id";
+
+            string updateRaceSql = @"UPDATE Races 
+                                     SET Title=@Title, Description=@Description, Image=@Image, RaceCategory=@RaceCategory 
+                                     WHERE Id=@Id";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    // Update Address
+                    int effectedAddressRows = connection.Execute(updateAddressSql, race.Address);
+
+                    // If update fail
+                    if (effectedAddressRows == 0) return false;
+
+                    // Update Race
+                    int effectedRaceRows = connection.Execute(updateRaceSql, race);
+                    return effectedRaceRows == 1 ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
 
-        public bool Delete(Race race)
+        public async Task<bool> Delete(int id)
         {
-            _context.Remove(race);
-            return Save();
-        }
+            string sql = "DELETE FROM Races WHERE Id = @id";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
 
-        public bool Save()
-        {
-            int saved = _context.SaveChanges();
-            return saved > 0 ? true : false;
+                    int affectedRows = connection.Execute(sql, new { id = id });
+                    return affectedRows >= 1 ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
     }
 }

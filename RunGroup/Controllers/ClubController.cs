@@ -66,7 +66,6 @@ namespace RunGroup.Controllers
             if (ModelState.IsValid)
             {
                 ImageUploadResult result = await _photoService.AddPhotoAsync(club.Image);
-
                 Club newClub = new Club
                 {
                     Title = club.Title,

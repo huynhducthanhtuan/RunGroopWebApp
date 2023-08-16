@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using RunGroup.Data;
 using RunGroup.Interfaces;
 using RunGroup.Models;
 using RunGroup.ViewModels;
@@ -86,10 +85,12 @@ namespace RunGroup.Repositories
 
         public async Task<bool> Add(Club club)
         {
-            string insertAddressSql = "INSERT INTO Addresses (Street, City, State) VALUES (@Street, @City, @State); " +
-                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
-            string insertClubSql = "INSERT INTO Clubs (Title, Description, Image, ClubCategory, AddressId, AppUserId) " +
-                                   "VALUES (@Title, @Description, @Image, @ClubCategory, @AddressId, @AppUserId)";
+            string insertAddressSql = @"INSERT INTO Addresses (Street, City, State) 
+                                        VALUES (@Street, @City, @State);
+                                        SELECT CAST(SCOPE_IDENTITY() as int)";
+
+            string insertClubSql = @"INSERT INTO Clubs (Title, Description, Image, ClubCategory, AddressId, AppUserId)
+                                     VALUES (@Title, @Description, @Image, @ClubCategory, @AddressId, @AppUserId)";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -121,6 +122,7 @@ namespace RunGroup.Repositories
             string updateAddressSql = @"UPDATE Addresses 
                                         SET Street=@Street, City=@City, State=@State 
                                         WHERE Id=@Id";
+
             string updateClubSql = @"UPDATE Clubs 
                                      SET Title=@Title, Description=@Description, Image=@Image, ClubCategory=@ClubCategory 
                                      WHERE Id=@Id";
@@ -150,12 +152,13 @@ namespace RunGroup.Repositories
 
         public async Task<bool> Delete(int id)
         {
-            string sql = @"DELETE FROM Clubs WHERE Id = @id";
+            string sql = "DELETE FROM Clubs WHERE Id = @id";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
+
                     int affectedRows = connection.Execute(sql, new { id = id });
                     return affectedRows >= 1 ? true : false;
                 }
