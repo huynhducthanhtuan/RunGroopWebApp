@@ -158,7 +158,6 @@ namespace RunGroup.Repositories
                 try
                 {
                     connection.Open();
-
                     int affectedRows = connection.Execute(sql, new { id = id });
                     return affectedRows >= 1 ? true : false;
                 }

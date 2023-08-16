@@ -1,15 +1,12 @@
-﻿using RunGroup.Models;
+﻿using RunGroup.ViewModels;
 
 namespace RunGroup.Interfaces
 {
     public interface IUserRepository
     {
-        Task<List<AppUser>> GetAllUsers();
-        Task<AppUser> GetUserById(string id);
-        Task<AppUser> GetUserByIdNoTracking(string id);
-        bool Add(AppUser user);
-        bool Update(AppUser user);
-        bool Delete(AppUser user);
-        bool Save();
+        Task<IEnumerable<UserViewModel>> GetAllUsers();
+        Task<UserDetailViewModel> GetUserById(string id);
+        Task<bool> Update(UserDetailViewModel user);
+        Task<bool> UpdateProfileImageUrl(string userId, string profileImageUrl);
     }
 }

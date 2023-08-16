@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using RunGroup.Data;
 using RunGroup.Helpers;
 using RunGroup.Interfaces;
 using RunGroup.Models;

@@ -48,6 +48,13 @@
                             <form method="POST" asp-action="EditProfile" class="row">
                                 <div class="col-6">
                                     <div class="form-group">
+                                        <label asp-for="Street">Street:</label>
+                                        <input asp-for="Street" type="text" class="form-control form-control-lg" />
+                                        <span asp-validation-for="Street" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
                                         <label asp-for="City">City:</label>
                                         <input asp-for="City" type="text" class="form-control form-control-lg" />
                                         <span asp-validation-for="City" class="text-danger"></span>
@@ -74,7 +81,8 @@
                                         <span asp-validation-for="Mileage" class="text-danger"></span>
                                     </div>
                                 </div>
-                                <div class="col-12">
+                                <br />
+                                <div class="col-12" style="margin-top: 10px">
                                     <div class="form-group">
                                         <button class="btn btn-primary" type="submit">Save changes</button>
                                     </div>

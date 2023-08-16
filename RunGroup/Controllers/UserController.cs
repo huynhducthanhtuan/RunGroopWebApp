@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Mvc;
 using RunGroup.Interfaces;
-using RunGroup.Models;
-using RunGroup.Utils;
 using RunGroup.ViewModels;
 
 namespace RunGroup.Controllers
@@ -9,66 +8,34 @@ namespace RunGroup.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
-        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IPhotoService _photoService;
 
-        public UserController(
-            IUserRepository userRepository,
-            IHttpContextAccessor contextAccessor,
-            IPhotoService photoService
-        )
+        public UserController(IUserRepository userRepository, IPhotoService photoService)
         {
             _userRepository = userRepository;
-            _contextAccessor = contextAccessor;
             _photoService = photoService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            List<AppUser> users = await _userRepository.GetAllUsers();
-            List<UserViewModel> userViewModels = new List<UserViewModel>();
-
-            foreach (var user in users)
-            {
-                UserViewModel userViewModel = new UserViewModel()
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Pace = user.Pace,
-                    Mileage = user.Mileage,
-                    ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageUrl)
-                        ? AppConstants.DEFAULT_AVATAR_URL : user.ProfileImageUrl
-                };
-                userViewModels.Add(userViewModel);
-            }
-
-            return View(userViewModels);
+            IEnumerable<UserViewModel> users = await _userRepository.GetAllUsers();
+            if (users == null) return View("Error");
+            else return View(users);
         }
 
         [HttpGet]
         public async Task<IActionResult> Detail(string id)
         {
-            AppUser user = await _userRepository.GetUserById(id);
+            UserDetailViewModel user = await _userRepository.GetUserById(id);
             if (user == null) return View("Error");
-
-            UserDetailViewModel userDetailViewModel = new UserDetailViewModel()
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                Pace = user.Pace,
-                Mileage = user.Mileage,
-                ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageUrl)
-                    ? AppConstants.DEFAULT_AVATAR_URL : user.ProfileImageUrl
-            };
-
-            return View(userDetailViewModel);
+            else return View(user);
         }
 
         [HttpGet]
         public async Task<IActionResult> EditProfile(string id)
         {
-            AppUser user = await _userRepository.GetUserById(id);
+            UserDetailViewModel user = await _userRepository.GetUserById(id);
             if (user == null) return View("Error");
 
             EditProfileViewModel editProfileViewModel = new EditProfileViewModel()
@@ -76,16 +43,16 @@ namespace RunGroup.Controllers
                 Id = user.Id,
                 Pace = user.Pace,
                 Mileage = user.Mileage,
+                Street = user.Street,
                 City = user.City,
                 State = user.State,
-                ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageUrl)
-                    ? AppConstants.DEFAULT_AVATAR_URL : user.ProfileImageUrl
+                ProfileImageUrl = user.ProfileImageUrl
             };
             return View(editProfileViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditProfile(EditProfileViewModel editProfileViewModel)
+        public async Task<IActionResult> EditProfile(string id, EditProfileViewModel editProfileViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -93,7 +60,7 @@ namespace RunGroup.Controllers
                 return View("EditProfile", editProfileViewModel);
             }
 
-            AppUser user = await _userRepository.GetUserById(editProfileViewModel.Id);
+            UserDetailViewModel user = await _userRepository.GetUserById(id);
             if (user == null) return View("Error");
 
             // Only update profile image
@@ -104,21 +71,22 @@ namespace RunGroup.Controllers
                     _photoService.DeletePhotoAsync(user.ProfileImageUrl);
                 }
 
-                var photoResult = _photoService.AddPhotoAsync(editProfileViewModel.Image);
-                user.ProfileImageUrl = photoResult.Result.Url.ToString();
-                _userRepository.Update(user);
+                ImageUploadResult photoResult = await _photoService.AddPhotoAsync(editProfileViewModel.Image);
+                string profileImageUrl = photoResult.Url.ToString();
 
+                await _userRepository.UpdateProfileImageUrl(user.Id, profileImageUrl);
                 return RedirectToAction("EditProfile", "User", new { user.Id });
             }
-            // Update all info except profile image
+            // Update rest info
             else
             {
                 user.Pace = editProfileViewModel.Pace;
                 user.Mileage = editProfileViewModel.Mileage;
+                user.Street = editProfileViewModel.Street;
                 user.City = editProfileViewModel.City;
                 user.State = editProfileViewModel.State;
-                _userRepository.Update(user);
 
+                await _userRepository.Update(user);
                 return RedirectToAction("Detail", "User", new { user.Id });
             }
         }

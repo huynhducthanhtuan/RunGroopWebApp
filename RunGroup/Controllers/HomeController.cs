@@ -43,10 +43,7 @@ namespace RunGroup.Controllers
                 if (homeViewModel.City != null)
                 {
                     IEnumerable<Club> clubs = await _clubRepository.GetClubsByCity(homeViewModel.City);
-                    if (clubs.Count() > 0)
-                    {
-                        homeViewModel.Clubs = clubs;
-                    }
+                    if (clubs.Count() > 0) homeViewModel.Clubs = clubs;
                 }
                 return View(homeViewModel);
             }
