@@ -1,16 +1,15 @@
 ﻿using RunGroup.Models;
+using RunGroup.ViewModels;
 
 namespace RunGroup.Interfaces
 {
     public interface IClubRepository
     {
         Task<IEnumerable<Club>> GetAllClubs();
-        Task<Club> GetClubById(int id);
-        Task<Club> GetClubByIdNoTracking(int id);
+        Task<ClubViewModel> GetClubById(int id);
         Task<IEnumerable<Club>> GetClubsByCity(string city);
-        bool Add(Club club);
-        bool Update(Club club);
-        bool Delete(Club club);
-        bool Save();
+        Task<bool> Add(Club club);
+        Task<bool> Update(Club club);
+        Task<bool> Delete(int id);
     }
 }

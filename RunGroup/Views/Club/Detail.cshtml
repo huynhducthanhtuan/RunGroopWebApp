@@ -1,4 +1,5 @@
-﻿@model Club
+﻿@using RunGroup.ViewModels;
+@model ClubViewModel
 @{
     ViewData["Title"] = "Detail Club";
 }
@@ -13,7 +14,7 @@
                 <div class="col-lg-4 d-flex flex-column justify-content-between mr-auto ml-auto">
                     <div>
                         <h1 class="mb-2">@Model.Title</h1>
-                        <h2 class="lead mb-3">@Model.Address.City, @Model.Address.State</h2>
+                        <h2 class="lead mb-3">@Model.AddressCity, @Model.AddressState</h2>
                         <div>
                             <span class="badge badge-secondary mr-3">@Model.ClubCategory</span>
                         </div>

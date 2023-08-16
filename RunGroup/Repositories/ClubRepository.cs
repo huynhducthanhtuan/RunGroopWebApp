@@ -1,69 +1,169 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using RunGroup.Data;
 using RunGroup.Interfaces;
 using RunGroup.Models;
+using RunGroup.ViewModels;
 
 namespace RunGroup.Repositories
 {
     public class ClubRepository : IClubRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private string connectionString;
 
-        public ClubRepository(ApplicationDbContext context)
+        public ClubRepository(IConfiguration configuration)
         {
-            _context = context;
+            _configuration = configuration;
+            connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task<IEnumerable<Club>> GetAllClubs()
         {
-            return await _context.Clubs.ToListAsync();
+            string sql = "SELECT * FROM Clubs";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    IEnumerable<Club> clubs = connection.Query<Club>(sql).ToList();
+                    return clubs;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
-        public async Task<Club> GetClubById(int id)
+        public async Task<ClubViewModel> GetClubById(int id)
         {
-            return await _context.Clubs
-                .Include(c => c.Address)
-                .FirstOrDefaultAsync(c => c.Id == id);
-        }
+            string sql =
+                @"SELECT c.Id, Title, Description, Image, ClubCategory, a.Id AS AddressId, 
+                        Street AS AddressStreet, City AS AddressCity, State AS AddressState
+                FROM Clubs AS c
+                LEFT JOIN Addresses AS a ON c.AddressId = a.Id
+                WHERE c.Id = @id";
 
-        public async Task<Club> GetClubByIdNoTracking(int id)
-        {
-            return await _context.Clubs
-                .Include(c => c.Address)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == id);
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    ClubViewModel club = connection.QueryFirstOrDefault<ClubViewModel>(sql, new { id = id });
+                    return club;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
         public async Task<IEnumerable<Club>> GetClubsByCity(string city)
         {
-            return await _context.Clubs
-                .Include(c => c.Address)
-                .Where(c => c.Address.City == city)
-                .ToListAsync();
+            string sql =
+                @"SELECT c.Id, Title, Description, Image, ClubCategory
+                FROM Clubs AS c
+                LEFT JOIN Addresses AS a ON c.AddressId = a.Id
+                WHERE a.City = @city";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    IEnumerable<Club> clubs = connection.Query<Club>(sql, new { city = city });
+                    return clubs;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
-        public bool Add(Club club)
+        public async Task<bool> Add(Club club)
         {
-            _context.Add(club);
-            return Save();
+            string insertAddressSql = "INSERT INTO Addresses (Street, City, State) VALUES (@Street, @City, @State); " +
+                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
+            string insertClubSql = "INSERT INTO Clubs (Title, Description, Image, ClubCategory, AddressId, AppUserId) " +
+                                   "VALUES (@Title, @Description, @Image, @ClubCategory, @AddressId, @AppUserId)";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    // Insert Address & get inserted Address Id
+                    int addressId = await connection.ExecuteScalarAsync<int>(insertAddressSql, club.Address);
+
+                    // If insert fail
+                    if (addressId == 0) return false;
+
+                    club.AddressId = addressId;
+
+                    // Insert Club
+                    int effectedRows = await connection.ExecuteAsync(insertClubSql, club);
+                    return effectedRows == 1 ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
 
-        public bool Update(Club club)
+        public async Task<bool> Update(Club club)
         {
-            _context.Update(club);
-            return Save();
+            string updateAddressSql = @"UPDATE Addresses 
+                                        SET Street=@Street, City=@City, State=@State 
+                                        WHERE Id=@Id";
+            string updateClubSql = @"UPDATE Clubs 
+                                     SET Title=@Title, Description=@Description, Image=@Image, ClubCategory=@ClubCategory 
+                                     WHERE Id=@Id";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    // Update Address
+                    int effectedAddressRows = connection.Execute(updateAddressSql, club.Address);
+
+                    // If update fail
+                    if (effectedAddressRows == 0) return false;
+
+                    // Update Club
+                    int effectedClubRows = connection.Execute(updateClubSql, club);
+                    return effectedClubRows == 1 ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
 
-        public bool Delete(Club club)
+        public async Task<bool> Delete(int id)
         {
-            _context.Remove(club);
-            return Save();
-        }
-
-        public bool Save()
-        {
-            int saved = _context.SaveChanges();
-            return saved > 0 ? true : false;
+            string sql = @"DELETE FROM Clubs WHERE Id = @id";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    int affectedRows = connection.Execute(sql, new { id = id });
+                    return affectedRows >= 1 ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
     }
 }
