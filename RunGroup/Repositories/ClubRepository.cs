@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RunGroup.Interfaces;
 using RunGroup.Models;
 using RunGroup.ViewModels;
+using System.Data;
 
 namespace RunGroup.Repositories
 {
@@ -20,13 +21,15 @@ namespace RunGroup.Repositories
 
         public async Task<IEnumerable<Club>> GetAllClubs()
         {
-            string sql = "SELECT * FROM Clubs";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    IEnumerable<Club> clubs = connection.Query<Club>(sql).ToList();
+                    IEnumerable<Club> clubs = connection.Query<Club>(
+                        "GetAllClubs", 
+                        commandType: CommandType.StoredProcedure
+                    );
                     return clubs;
                 }
                 catch (Exception ex)
@@ -38,19 +41,16 @@ namespace RunGroup.Repositories
 
         public async Task<ClubViewModel> GetClubById(int id)
         {
-            string sql =
-                @"SELECT c.Id, Title, Description, Image, ClubCategory, a.Id AS AddressId, 
-                        Street AS AddressStreet, City AS AddressCity, State AS AddressState
-                FROM Clubs AS c
-                LEFT JOIN Addresses AS a ON c.AddressId = a.Id
-                WHERE c.Id = @id";
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    ClubViewModel club = connection.QueryFirstOrDefault<ClubViewModel>(sql, new { id = id });
+                    ClubViewModel club = connection.QueryFirstOrDefault<ClubViewModel>(
+                        "GetClubById", 
+                        new { id = id },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return club;
                 }
                 catch (Exception ex)
@@ -62,18 +62,16 @@ namespace RunGroup.Repositories
 
         public async Task<IEnumerable<Club>> GetClubsByCity(string city)
         {
-            string sql =
-                @"SELECT c.Id, Title, Description, Image, ClubCategory
-                FROM Clubs AS c
-                LEFT JOIN Addresses AS a ON c.AddressId = a.Id
-                WHERE a.City = @city";
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    IEnumerable<Club> clubs = connection.Query<Club>(sql, new { city = city });
+                    IEnumerable<Club> clubs = connection.Query<Club>(
+                        "GetClubsByCity",
+                        new { city = city },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return clubs;
                 }
                 catch (Exception ex)
@@ -85,13 +83,6 @@ namespace RunGroup.Repositories
 
         public async Task<bool> Add(Club club)
         {
-            string insertAddressSql = @"INSERT INTO Addresses (Street, City, State) 
-                                        VALUES (@Street, @City, @State);
-                                        SELECT CAST(SCOPE_IDENTITY() as int)";
-
-            string insertClubSql = @"INSERT INTO Clubs (Title, Description, Image, ClubCategory, AddressId, AppUserId)
-                                     VALUES (@Title, @Description, @Image, @ClubCategory, @AddressId, @AppUserId)";
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -99,7 +90,16 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     // Insert Address & get inserted Address Id
-                    int addressId = await connection.ExecuteScalarAsync<int>(insertAddressSql, club.Address);
+                    int addressId = await connection.ExecuteScalarAsync<int>(
+                        "AddAddress", 
+                        new
+                        {
+                            Street = club.Address.Street,
+                            City = club.Address.City,
+                            State = club.Address.State
+                        }, 
+                        commandType: CommandType.StoredProcedure
+                    );
 
                     // If insert fail
                     if (addressId == 0) return false;
@@ -107,7 +107,19 @@ namespace RunGroup.Repositories
                     club.AddressId = addressId;
 
                     // Insert Club
-                    int effectedRows = await connection.ExecuteAsync(insertClubSql, club);
+                    int effectedRows = await connection.ExecuteAsync(
+                        "AddClub",
+                        new
+                        {
+                            Title = club.Title,
+                            Description = club.Description,
+                            Image = club.Image,
+                            ClubCategory = club.ClubCategory,
+                            AddressId = club.AddressId,
+                            AppUserId = club.AppUserId,
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return effectedRows == 1 ? true : false;
                 }
                 catch (Exception ex)
@@ -119,14 +131,6 @@ namespace RunGroup.Repositories
 
         public async Task<bool> Update(Club club)
         {
-            string updateAddressSql = @"UPDATE Addresses 
-                                        SET Street=@Street, City=@City, State=@State 
-                                        WHERE Id=@Id";
-
-            string updateClubSql = @"UPDATE Clubs 
-                                     SET Title=@Title, Description=@Description, Image=@Image, ClubCategory=@ClubCategory 
-                                     WHERE Id=@Id";
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -134,13 +138,34 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     // Update Address
-                    int effectedAddressRows = connection.Execute(updateAddressSql, club.Address);
+                    int effectedAddressRows = connection.Execute(
+                        "UpdateAddress",
+                        new
+                        {
+                            Id = club.Address.Id,
+                            Street = club.Address.Street,
+                            City = club.Address.City,
+                            State = club.Address.State
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
 
                     // If update fail
                     if (effectedAddressRows == 0) return false;
 
                     // Update Club
-                    int effectedClubRows = connection.Execute(updateClubSql, club);
+                    int effectedClubRows = connection.Execute(
+                        "UpdateClub",
+                        new
+                        {
+                            Id = club.Id,
+                            Title = club.Title,
+                            Description = club.Description,
+                            Image = club.Image,
+                            ClubCategory = club.ClubCategory
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return effectedClubRows == 1 ? true : false;
                 }
                 catch (Exception ex)
@@ -152,13 +177,16 @@ namespace RunGroup.Repositories
 
         public async Task<bool> Delete(int id)
         {
-            string sql = "DELETE FROM Clubs WHERE Id = @id";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    int affectedRows = connection.Execute(sql, new { id = id });
+                    int affectedRows = connection.Execute(
+                        "DeleteClub", 
+                        new { id = id },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return affectedRows >= 1 ? true : false;
                 }
                 catch (Exception ex)
