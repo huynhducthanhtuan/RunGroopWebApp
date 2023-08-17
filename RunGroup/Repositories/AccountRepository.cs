@@ -37,7 +37,7 @@ namespace RunGroup.Repositories
         public async Task<bool> CheckExistedAccount(LoginViewModel loginViewModel)
         {
             string sql = @"SELECT COUNT(*) FROM AspNetUsers
-                           WHERE Email = @Email AND Password = @Password";
+                           WHERE Email = @Email AND PasswordHash = @Password";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -64,20 +64,25 @@ namespace RunGroup.Repositories
 
         public async Task<bool> Register(RegisterViewModel registerViewModel)
         {
-            string sql = @"INSERT INTO AspNetUsers (Email, Password) 
-                           SET Email = @Email AND Password = @Password";
+            string sql = @"INSERT INTO AspNetUsers (Id, Email, PasswordHash, UserName, EmailConfirmed, PhoneNumberConfirmed, 
+                                                    TwoFactorEnabled, LockoutEnabled, AccessFailedCount, Street) 
+                           VALUES (@Id, @Email, @Password, @UserName, 0, 0, 0, 0, 0, '')";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
+                    
+                    string autoId = Guid.NewGuid().ToString("D");
 
                     int affectedRows = connection.Execute(
                         sql,
                         new
                         {
+                            Id = autoId,
                             Email = registerViewModel.EmailAddress,
                             Password = registerViewModel.Password,
+                            UserName = registerViewModel.EmailAddress.Split('@')[0]
                         }
                     );
 
