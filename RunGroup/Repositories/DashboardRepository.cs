@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using RunGroup.Helpers;
 using RunGroup.Interfaces;
 using RunGroup.Models;
+using System.Data;
 
 namespace RunGroup.Repositories
 {
@@ -24,19 +25,17 @@ namespace RunGroup.Repositories
 
         public async Task<IEnumerable<Club>> GetAllUserClubs()
         {
-            string sql =
-                @"SELECT c.Id, Title, Description, Image, ClubCategory
-                FROM Clubs AS c
-                LEFT JOIN Addresses AS a ON c.AddressId = a.Id
-                WHERE c.AppUserId = @id";
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
                     string userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                    IEnumerable<Club> clubs = connection.Query<Club>(sql, new { id = userId });
+                    IEnumerable<Club> clubs = connection.Query<Club>(
+                        "GetAllUserClubs",
+                        new { id = userId },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return clubs;
                 }
                 catch (Exception ex)
@@ -48,19 +47,17 @@ namespace RunGroup.Repositories
 
         public async Task<IEnumerable<Race>> GetAllUserRaces()
         {
-            string sql =
-                @"SELECT r.Id, Title, Description, Image, RaceCategory
-                FROM Races AS r
-                LEFT JOIN Addresses AS a ON r.AddressId = a.Id
-                WHERE r.AppUserId = @id";
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
                     string userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                    IEnumerable<Race> races = connection.Query<Race>(sql, new { id = userId });
+                    IEnumerable<Race> races = connection.Query<Race>(
+                        "GetAllUserRaces", 
+                        new { id = userId },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return races;
                 }
                 catch (Exception ex)
