@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using RunGroup.Interfaces;
 using RunGroup.ViewModels;
+using System.Data;
 
 namespace RunGroup.Repositories
 {
@@ -19,13 +20,15 @@ namespace RunGroup.Repositories
 
         public async Task<IEnumerable<UserViewModel>> GetAllUsers()
         {
-            string sql = "SELECT Id, UserName, ProfileImageUrl FROM AspNetUsers";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    IEnumerable<UserViewModel> users = connection.Query<UserViewModel>(sql).ToList();
+                    IEnumerable<UserViewModel> users = connection.Query<UserViewModel>(
+                        "GetAllUsers",
+                        commandType: CommandType.StoredProcedure
+                    );
                     return users;
                 }
                 catch (Exception ex)
@@ -37,15 +40,16 @@ namespace RunGroup.Repositories
 
         public async Task<UserDetailViewModel> GetUserById(string id)
         {
-            string sql = @"SELECT Id, UserName, Pace, Mileage, ProfileImageUrl, Street, City, State 
-                           FROM AspNetUsers WHERE Id = @id";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    UserDetailViewModel user = connection.
-                            QueryFirstOrDefault<UserDetailViewModel>(sql, new { id = id });
+                    UserDetailViewModel user = connection.QueryFirstOrDefault<UserDetailViewModel>(
+                        "GetUserById",
+                        new { id = id },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return user;
                 }
                 catch (Exception ex)
@@ -57,16 +61,24 @@ namespace RunGroup.Repositories
 
         public async Task<bool> Update(UserDetailViewModel user)
         {
-            string sql = @"UPDATE AspNetUsers
-                           SET Pace=@Pace, Mileage=@Mileage, Street=@Street, City=@City, State=@State
-                           WHERE Id=@Id";
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    int effectedRaceRows = connection.Execute(sql, user);
+                    int effectedRaceRows = connection.Execute(
+                        "UpdateUser",
+                        new
+                        {
+                            Id = user.Id,
+                            Pace = user.Pace,
+                            Mileage = user.Mileage,
+                            Street = user.Street,
+                            City = user.City,
+                            State = user.State
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return effectedRaceRows == 1 ? true : false;
                 }
                 catch (Exception ex)
@@ -78,7 +90,6 @@ namespace RunGroup.Repositories
 
         public async Task<bool> UpdateProfileImageUrl(string userId, string profileImageUrl)
         {
-            string sql = "UPDATE AspNetUsers SET ProfileImageUrl=@ProfileImageUrl WHERE Id=@Id";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -86,12 +97,13 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     int effectedRaceRows = connection.Execute(
-                        sql,
+                        "UpdateUserProfileImageUrl",
                         new
                         {
                             Id = userId,
                             ProfileImageUrl = profileImageUrl
-                        }
+                        },
+                        commandType: CommandType.StoredProcedure
                     );
 
                     return effectedRaceRows == 1 ? true : false;

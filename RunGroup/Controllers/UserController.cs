@@ -41,6 +41,7 @@ namespace RunGroup.Controllers
             EditProfileViewModel editProfileViewModel = new EditProfileViewModel()
             {
                 Id = user.Id,
+                UserName = user.UserName,
                 Pace = user.Pace,
                 Mileage = user.Mileage,
                 Street = user.Street,
