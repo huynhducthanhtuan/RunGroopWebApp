@@ -58,8 +58,7 @@ namespace RunGroup.Repositories
         public async Task<bool> Update(UserDetailViewModel user)
         {
             string sql = @"UPDATE AspNetUsers
-                           SET UserName=@UserName, Pace=@Pace, Mileage=@Mileage, ProfileImageUrl=@ProfileImageUrl, 
-                               Street=@Street, City=@City, State=@State
+                           SET Pace=@Pace, Mileage=@Mileage, Street=@Street, City=@City, State=@State
                            WHERE Id=@Id";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
