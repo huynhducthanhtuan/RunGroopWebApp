@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RunGroup.Interfaces;
 using RunGroup.Models;
 using RunGroup.ViewModels;
+using System.Data;
 
 namespace RunGroup.Repositories
 {
@@ -26,7 +27,10 @@ namespace RunGroup.Repositories
                 try
                 {
                     connection.Open();
-                    IEnumerable<Race> races = connection.Query<Race>(sql).ToList();
+                    IEnumerable<Race> races = connection.Query<Race>(
+                        "GetAllRaces",
+                        commandType: CommandType.StoredProcedure
+                    );
                     return races;
                 }
                 catch (Exception ex)
@@ -50,7 +54,11 @@ namespace RunGroup.Repositories
                 try
                 {
                     connection.Open();
-                    RaceViewModel race = connection.QueryFirstOrDefault<RaceViewModel>(sql, new { id = id });
+                    RaceViewModel race = connection.QueryFirstOrDefault<RaceViewModel>(
+                        "GetRaceById",
+                        new { id = id },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return race;
                 }
                 catch (Exception ex)
@@ -73,7 +81,11 @@ namespace RunGroup.Repositories
                 try
                 {
                     connection.Open();
-                    IEnumerable<Race> races = connection.Query<Race>(sql, new { city = city });
+                    IEnumerable<Race> races = connection.Query<Race>(
+                        "GetRacesByCity",
+                        new { city = city },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return races;
                 }
                 catch (Exception ex)
@@ -99,7 +111,16 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     // Insert Address & get inserted Address Id
-                    int addressId = await connection.ExecuteScalarAsync<int>(insertAddressSql, race.Address);
+                    int addressId = await connection.ExecuteScalarAsync<int>(
+                        "AddAddress",
+                        new
+                        {
+                            Street = race.Address.Street,
+                            City = race.Address.City,
+                            State = race.Address.State
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
 
                     // If insert fail
                     if (addressId == 0) return false;
@@ -107,7 +128,19 @@ namespace RunGroup.Repositories
                     race.AddressId = addressId;
 
                     // Insert Race
-                    int effectedRows = await connection.ExecuteAsync(insertRaceSql, race);
+                    int effectedRows = await connection.ExecuteAsync(
+                        "AddRace",
+                        new
+                        {
+                            Title = race.Title,
+                            Description = race.Description,
+                            Image = race.Image,
+                            RaceCategory = race.RaceCategory,
+                            AddressId = race.AddressId,
+                            AppUserId = race.AppUserId,
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return effectedRows == 1 ? true : false;
                 }
                 catch (Exception ex)
@@ -134,13 +167,34 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     // Update Address
-                    int effectedAddressRows = connection.Execute(updateAddressSql, race.Address);
+                    int effectedAddressRows = connection.Execute(
+                        "UpdateAddress",
+                        new
+                        {
+                            Id = race.Address.Id,
+                            Street = race.Address.Street,
+                            City = race.Address.City,
+                            State = race.Address.State
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
 
                     // If update fail
                     if (effectedAddressRows == 0) return false;
 
                     // Update Race
-                    int effectedRaceRows = connection.Execute(updateRaceSql, race);
+                    int effectedRaceRows = connection.Execute(
+                        "UpdateRace",
+                        new
+                        {
+                            Id = race.Id,
+                            Title = race.Title,
+                            Description = race.Description,
+                            Image = race.Image,
+                            RaceCategory = race.RaceCategory
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return effectedRaceRows == 1 ? true : false;
                 }
                 catch (Exception ex)
@@ -158,7 +212,11 @@ namespace RunGroup.Repositories
                 try
                 {
                     connection.Open();
-                    int affectedRows = connection.Execute(sql, new { id = id });
+                    int affectedRows = connection.Execute(
+                        "DeleteRace",
+                        new { id = id },
+                        commandType: CommandType.StoredProcedure
+                    );
                     return affectedRows >= 1 ? true : false;
                 }
                 catch (Exception ex)
