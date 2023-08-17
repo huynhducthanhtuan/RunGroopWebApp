@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using RunGroup.Interfaces;
 using RunGroup.ViewModels;
+using System.Data;
 
 namespace RunGroup.Repositories
 {
@@ -18,13 +19,18 @@ namespace RunGroup.Repositories
 
         public async Task<bool> CheckExistedEmail(string email)
         {
-            string sql = "SELECT COUNT(*) FROM AspNetUsers WHERE Email = @Email";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    int count = connection.ExecuteScalar<int>(sql, new { Email = email });
+
+                    int count = connection.ExecuteScalar<int>(
+                        "CheckExistedEmail",
+                        new { Email = email },
+                        commandType: CommandType.StoredProcedure
+                    );
+
                     return count == 1 ? true : false;
                 }
                 catch (Exception ex)
@@ -36,8 +42,6 @@ namespace RunGroup.Repositories
 
         public async Task<bool> CheckExistedAccount(LoginViewModel loginViewModel)
         {
-            string sql = @"SELECT COUNT(*) FROM AspNetUsers
-                           WHERE Email = @Email AND PasswordHash = @Password";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -45,12 +49,13 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     int count = connection.ExecuteScalar<int>(
-                        sql,
+                        "CheckExistedAccount",
                         new
                         {
                             Email = loginViewModel.EmailAddress,
                             Password = loginViewModel.Password
-                        }
+                        },
+                        commandType: CommandType.StoredProcedure
                     );
 
                     return count == 1 ? true : false;
@@ -64,9 +69,6 @@ namespace RunGroup.Repositories
 
         public async Task<bool> Register(RegisterViewModel registerViewModel)
         {
-            string sql = @"INSERT INTO AspNetUsers (Id, Email, PasswordHash, UserName, EmailConfirmed, PhoneNumberConfirmed, 
-                                                    TwoFactorEnabled, LockoutEnabled, AccessFailedCount, Street) 
-                           VALUES (@Id, @Email, @Password, @UserName, 0, 0, 0, 0, 0, '')";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -76,14 +78,15 @@ namespace RunGroup.Repositories
                     string autoId = Guid.NewGuid().ToString("D");
 
                     int affectedRows = connection.Execute(
-                        sql,
+                        "Register",
                         new
                         {
                             Id = autoId,
                             Email = registerViewModel.EmailAddress,
                             Password = registerViewModel.Password,
                             UserName = registerViewModel.EmailAddress.Split('@')[0]
-                        }
+                        },
+                        commandType: CommandType.StoredProcedure
                     );
 
                     return affectedRows == 1 ? true : false;
