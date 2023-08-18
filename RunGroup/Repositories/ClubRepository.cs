@@ -27,7 +27,7 @@ namespace RunGroup.Repositories
                 {
                     connection.Open();
                     IEnumerable<Club> clubs = connection.Query<Club>(
-                        "GetAllClubs", 
+                        "sp_GetAllClubs", 
                         commandType: CommandType.StoredProcedure
                     );
                     return clubs;
@@ -47,7 +47,7 @@ namespace RunGroup.Repositories
                 {
                     connection.Open();
                     ClubViewModel club = connection.QueryFirstOrDefault<ClubViewModel>(
-                        "GetClubById", 
+                        "sp_GetClubById", 
                         new { id = id },
                         commandType: CommandType.StoredProcedure
                     );
@@ -68,7 +68,7 @@ namespace RunGroup.Repositories
                 {
                     connection.Open();
                     IEnumerable<Club> clubs = connection.Query<Club>(
-                        "GetClubsByCity",
+                        "sp_GetClubsByCity",
                         new { city = city },
                         commandType: CommandType.StoredProcedure
                     );
@@ -91,7 +91,7 @@ namespace RunGroup.Repositories
 
                     // Insert Address & get inserted Address Id
                     int addressId = await connection.ExecuteScalarAsync<int>(
-                        "AddAddress", 
+                        "sp_AddAddress", 
                         new
                         {
                             Street = club.Address.Street,
@@ -108,7 +108,7 @@ namespace RunGroup.Repositories
 
                     // Insert Club
                     int effectedRows = await connection.ExecuteAsync(
-                        "AddClub",
+                        "sp_AddClub",
                         new
                         {
                             Title = club.Title,
@@ -139,7 +139,7 @@ namespace RunGroup.Repositories
 
                     // Update Address
                     int effectedAddressRows = connection.Execute(
-                        "UpdateAddress",
+                        "sp_UpdateAddress",
                         new
                         {
                             Id = club.Address.Id,
@@ -155,7 +155,7 @@ namespace RunGroup.Repositories
 
                     // Update Club
                     int effectedClubRows = connection.Execute(
-                        "UpdateClub",
+                        "sp_UpdateClub",
                         new
                         {
                             Id = club.Id,
@@ -183,7 +183,7 @@ namespace RunGroup.Repositories
                 {
                     connection.Open();
                     int affectedRows = connection.Execute(
-                        "DeleteClub", 
+                        "sp_DeleteClub", 
                         new { id = id },
                         commandType: CommandType.StoredProcedure
                     );

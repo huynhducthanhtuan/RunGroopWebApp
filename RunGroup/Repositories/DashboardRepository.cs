@@ -32,7 +32,7 @@ namespace RunGroup.Repositories
                     connection.Open();
                     string userId = _httpContextAccessor.HttpContext.User.GetUserId();
                     IEnumerable<Club> clubs = connection.Query<Club>(
-                        "GetAllUserClubs",
+                        "sp_GetAllUserClubs",
                         new { id = userId },
                         commandType: CommandType.StoredProcedure
                     );
@@ -54,7 +54,7 @@ namespace RunGroup.Repositories
                     connection.Open();
                     string userId = _httpContextAccessor.HttpContext.User.GetUserId();
                     IEnumerable<Race> races = connection.Query<Race>(
-                        "GetAllUserRaces", 
+                        "sp_GetAllUserRaces", 
                         new { id = userId },
                         commandType: CommandType.StoredProcedure
                     );

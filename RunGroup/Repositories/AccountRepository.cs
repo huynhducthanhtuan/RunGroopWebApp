@@ -26,7 +26,7 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     int count = connection.ExecuteScalar<int>(
-                        "CheckExistedEmail",
+                        "sp_CheckExistedEmail",
                         new { Email = email },
                         commandType: CommandType.StoredProcedure
                     );
@@ -49,7 +49,7 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     int count = connection.ExecuteScalar<int>(
-                        "CheckExistedAccount",
+                        "sp_CheckExistedAccount",
                         new
                         {
                             Email = loginViewModel.EmailAddress,
@@ -78,7 +78,7 @@ namespace RunGroup.Repositories
                     string autoId = Guid.NewGuid().ToString("D");
 
                     int affectedRows = connection.Execute(
-                        "Register",
+                        "sp_RegisterUser",
                         new
                         {
                             Id = autoId,

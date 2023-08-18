@@ -26,7 +26,7 @@ namespace RunGroup.Repositories
                 {
                     connection.Open();
                     IEnumerable<UserViewModel> users = connection.Query<UserViewModel>(
-                        "GetAllUsers",
+                        "sp_GetAllUsers",
                         commandType: CommandType.StoredProcedure
                     );
                     return users;
@@ -46,7 +46,7 @@ namespace RunGroup.Repositories
                 {
                     connection.Open();
                     UserDetailViewModel user = connection.QueryFirstOrDefault<UserDetailViewModel>(
-                        "GetUserById",
+                        "sp_GetUserById",
                         new { id = id },
                         commandType: CommandType.StoredProcedure
                     );
@@ -67,7 +67,7 @@ namespace RunGroup.Repositories
                 {
                     connection.Open();
                     int effectedRaceRows = connection.Execute(
-                        "UpdateUser",
+                        "sp_UpdateUser",
                         new
                         {
                             Id = user.Id,
@@ -97,7 +97,7 @@ namespace RunGroup.Repositories
                     connection.Open();
 
                     int effectedRaceRows = connection.Execute(
-                        "UpdateUserProfileImageUrl",
+                        "sp_UpdateUserProfileImageUrl",
                         new
                         {
                             Id = userId,
