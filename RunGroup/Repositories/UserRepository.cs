@@ -1,59 +1,118 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RunGroup.Data;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using RunGroup.Interfaces;
-using RunGroup.Models;
+using RunGroup.ViewModels;
+using System.Data;
 
 namespace RunGroup.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private string connectionString;
 
-        public UserRepository(ApplicationDbContext context)
+        public UserRepository(IConfiguration configuration)
         {
-            _context = context;
+            _configuration = configuration;
+            connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<List<AppUser>> GetAllUsers()
+        public async Task<IEnumerable<UserViewModel>> GetAllUsers()
         {
-            return _context.Users.ToList();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    IEnumerable<UserViewModel> users = connection.Query<UserViewModel>(
+                        "sp_GetAllUsers",
+                        commandType: CommandType.StoredProcedure
+                    );
+                    return users;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
-        public async Task<AppUser> GetUserById(string id)
+        public async Task<UserDetailViewModel> GetUserById(string id)
         {
-            return _context.Users.Find(id);
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    UserDetailViewModel user = connection.QueryFirstOrDefault<UserDetailViewModel>(
+                        "sp_GetUserById",
+                        new { id = id },
+                        commandType: CommandType.StoredProcedure
+                    );
+                    return user;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
         }
 
-        public async Task<AppUser> GetUserByIdNoTracking(string id)
+        public async Task<bool> Update(UserDetailViewModel user)
         {
-            return _context.Users
-                .Where(u => u.Id == id)
-                .AsNoTracking()
-                .FirstOrDefault();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    int effectedRaceRows = connection.Execute(
+                        "sp_UpdateUser",
+                        new
+                        {
+                            Id = user.Id,
+                            Pace = user.Pace,
+                            Mileage = user.Mileage,
+                            Street = user.Street,
+                            City = user.City,
+                            State = user.State
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
+                    return effectedRaceRows == 1 ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
 
-        public bool Add(AppUser user)
+        public async Task<bool> UpdateProfileImageUrl(string userId, string profileImageUrl)
         {
-            _context.Add(user);
-            return Save();
-        }
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
 
-        public bool Update(AppUser user)
-        {
-            _context.Update(user);
-            return Save();
-        }
+                    int effectedRaceRows = connection.Execute(
+                        "sp_UpdateUserProfileImageUrl",
+                        new
+                        {
+                            Id = userId,
+                            ProfileImageUrl = profileImageUrl
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
 
-        public bool Delete(AppUser user)
-        {
-            _context.Remove(user);
-            return Save();
-        }
-
-        public bool Save()
-        {
-            int saved = _context.SaveChanges();
-            return saved > 0 ? true : false;
+                    return effectedRaceRows == 1 ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
     }
 }

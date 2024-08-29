@@ -21,6 +21,7 @@
         <select asp-for="RaceCategory" asp-items="@Html.GetEnumSelectList<RaceCategory>()" class="form-control">
             <option value="">-- Select --</option>
         </select>
+        <span asp-validation-for="RaceCategory" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Address.Street">Street</label>
@@ -42,5 +43,6 @@
         <input asp-for="Image" type="file" class="form-control">
         <span asp-validation-for="Image" class="text-danger"></span>
     </div>
+    <br />
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>

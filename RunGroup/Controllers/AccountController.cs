@@ -10,17 +10,14 @@ namespace RunGroup.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly ApplicationDbContext _context;
 
         public AccountController(
             UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager,
-            ApplicationDbContext context
+            SignInManager<AppUser> signInManager
         )
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _context = context;
         }
 
         [HttpGet]
@@ -47,7 +44,7 @@ namespace RunGroup.Controllers
                     var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, false, false);
                     if (result.Succeeded)
                     {
-                        return RedirectToAction("Index", "Club");
+                        return RedirectToAction("Index", "Home");
                     }
                 }
 

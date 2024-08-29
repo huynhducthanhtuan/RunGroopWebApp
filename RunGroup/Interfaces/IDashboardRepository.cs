@@ -4,7 +4,7 @@ namespace RunGroup.Interfaces
 {
     public interface IDashboardRepository
     {
-        Task<List<Club>> GetAllUserClubs();
-        Task<List<Race>> GetAllUserRaces();
+        Task<IEnumerable<Club>> GetAllUserClubs();
+        Task<IEnumerable<Race>> GetAllUserRaces();
     }
 }

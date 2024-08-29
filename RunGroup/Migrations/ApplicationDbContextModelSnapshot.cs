@@ -175,9 +175,6 @@ namespace RunGroup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ZipCode")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Addresses");
@@ -246,6 +243,9 @@ namespace RunGroup.Migrations
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -311,23 +311,13 @@ namespace RunGroup.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Contact")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("EntryFee")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Facebook")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
@@ -336,17 +326,7 @@ namespace RunGroup.Migrations
                     b.Property<int>("RaceCategory")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("StartTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Twitter")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Website")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -437,9 +417,7 @@ namespace RunGroup.Migrations
                 {
                     b.HasOne("RunGroup.Models.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AddressId");
 
                     b.HasOne("RunGroup.Models.AppUser", "AppUser")
                         .WithMany("Races")

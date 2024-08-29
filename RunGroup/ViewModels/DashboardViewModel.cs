@@ -4,7 +4,7 @@ namespace RunGroup.ViewModels
 {
     public class DashboardViewModel
     {
-        public List<Club> Clubs { get; set; }
-        public List<Race> Races { get; set; }
+        public IEnumerable<Club> Clubs { get; set; }
+        public IEnumerable<Race> Races { get; set; }
     }
 }

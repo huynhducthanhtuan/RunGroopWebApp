@@ -12,20 +12,19 @@ namespace RunGroup.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IClubRepository _clubRepository;
 
-        public HomeController(ILogger<HomeController> logger, IClubRepository clubRepository)
+        public HomeController(IClubRepository clubRepository)
         {
-            _logger = logger;
             _clubRepository = clubRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var ipInfo = new IPInfo();
-            var homeViewModel = new HomeViewModel();
+            IPInfo ipInfo = new IPInfo();
+            HomeViewModel homeViewModel = new HomeViewModel();
+
             try
             {
                 // Get clubs in your city using IPInfo API
@@ -44,10 +43,7 @@ namespace RunGroup.Controllers
                 if (homeViewModel.City != null)
                 {
                     IEnumerable<Club> clubs = await _clubRepository.GetClubsByCity(homeViewModel.City);
-                    if (clubs.Count() > 0)
-                    {
-                        homeViewModel.Clubs = clubs;
-                    }
+                    if (clubs.Count() > 0) homeViewModel.Clubs = clubs;
                 }
                 return View(homeViewModel);
             }

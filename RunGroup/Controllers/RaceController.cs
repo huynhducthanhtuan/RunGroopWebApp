@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Mvc;
 using RunGroup.Helpers;
 using RunGroup.Interfaces;
 using RunGroup.Models;
@@ -33,7 +34,7 @@ namespace RunGroup.Controllers
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {
-            Race race = await _raceRepository.GetRaceById(id);
+            RaceViewModel race = await _raceRepository.GetRaceById(id);
             if (race == null)
             {
                 TempData["Error"] = "This race is not found!";
@@ -60,27 +61,28 @@ namespace RunGroup.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateRaceViewModel newRace)
+        public async Task<IActionResult> Create(CreateRaceViewModel race)
         {
             if (ModelState.IsValid)
             {
-                var result = await _photoService.AddPhotoAsync(newRace.Image);
-                var race = new Race
+                ImageUploadResult result = await _photoService.AddPhotoAsync(race.Image);
+                Race newRace = new Race
                 {
-                    Title = newRace.Title,
-                    Description = newRace.Description,
+                    Title = race.Title,
+                    Description = race.Description,
                     Image = result.Url.ToString(),
-                    RaceCategory = newRace.RaceCategory,
+                    RaceCategory = race.RaceCategory,
                     Address = new Address
                     {
-                        Street = newRace.Address.Street,
-                        City = newRace.Address.City,
-                        State = newRace.Address.State,
+                        Street = race.Address.Street,
+                        City = race.Address.City,
+                        State = race.Address.State,
                     },
-                    AppUserId = newRace.AppUserId
+                    AppUserId = race.AppUserId
                 };
 
-                _raceRepository.Add(race);
+                _raceRepository.Add(newRace);
+
                 return RedirectToAction("Index");
             }
             else
@@ -88,22 +90,28 @@ namespace RunGroup.Controllers
                 ModelState.AddModelError("", "Photo upload failed");
             }
 
-            return View(newRace);
+            return View(race);
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var race = await _raceRepository.GetRaceByIdNoTracking(id);
+            RaceViewModel race = await _raceRepository.GetRaceById(id);
             if (race == null) return View("Error");
 
-            var oldRace = new EditRaceViewModel
+            EditRaceViewModel oldRace = new EditRaceViewModel
             {
                 Title = race.Title,
                 Description = race.Description,
                 RaceCategory = race.RaceCategory,
-                AddressId = race.AddressId,
-                Address = race.Address,
+                AddressId = (int)race.AddressId,
+                Address = new Address()
+                {
+                    Id = (int)race.AddressId,
+                    Street = race.AddressStreet,
+                    City = race.AddressCity,
+                    State = race.AddressState
+                }
             };
             return View(oldRace);
         }
@@ -117,10 +125,10 @@ namespace RunGroup.Controllers
                 return View("Edit", newRace);
             }
 
-            var race = await _raceRepository.GetRaceByIdNoTracking(id);
+            RaceViewModel race = await _raceRepository.GetRaceById(id);
             if (race == null) return View("Error");
 
-            var photoResult = await _photoService.AddPhotoAsync(newRace.Image);
+            ImageUploadResult photoResult = await _photoService.AddPhotoAsync(newRace.Image);
             if (photoResult.Error != null)
             {
                 ModelState.AddModelError("Image", "Photo upload failed");
@@ -131,16 +139,22 @@ namespace RunGroup.Controllers
                 _ = _photoService.DeletePhotoAsync(race.Image);
             }
 
-            var updateRace = new Race
+            Race updateRace = new Race
             {
-                Id = id,
+                Id = newRace.Id,
                 Title = newRace.Title,
                 Description = newRace.Description,
                 Image = photoResult.Url.ToString(),
                 AddressId = newRace.AddressId,
-                Address = newRace.Address,
+                Address = new Address()
+                {
+                    Id = (int)race.AddressId,
+                    Street = newRace.Address.Street,
+                    City = newRace.Address.City,
+                    State = newRace.Address.State
+                }
             };
-            _raceRepository.Update(updateRace);
+            await _raceRepository.Update(updateRace);
 
             return RedirectToAction("Index");
         }
@@ -148,10 +162,12 @@ namespace RunGroup.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            Race race = await _raceRepository.GetRaceById(id);
+            RaceViewModel race = await _raceRepository.GetRaceById(id);
             if (race == null) return View("Error");
 
-            _raceRepository.Delete(race);
+            bool isDeleted = await _raceRepository.Delete(id);
+            if (isDeleted == false) return View("Error");
+
             return RedirectToAction("Index");
         }
     }

@@ -17,9 +17,10 @@ namespace RunGroup.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            List<Club> clubs = await _dashboardRepository.GetAllUserClubs();
-            List<Race> races = await _dashboardRepository.GetAllUserRaces();
-            var dashboardInfo = new DashboardViewModel()
+            IEnumerable<Club> clubs = await _dashboardRepository.GetAllUserClubs();
+            IEnumerable<Race> races = await _dashboardRepository.GetAllUserRaces();
+
+            DashboardViewModel dashboardInfo = new DashboardViewModel()
             {
                 Clubs = clubs,
                 Races = races

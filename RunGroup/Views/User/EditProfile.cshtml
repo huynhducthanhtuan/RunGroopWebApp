@@ -41,11 +41,21 @@
                     <div class="row mb-4">
                         <div class="col">
                             <h5>Profile Information</h5>
+                            <div class="mb-3">
+                                <h1 class="h2 mb-2">@Model.UserName</h1>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-8 order-md-1">
                             <form method="POST" asp-action="EditProfile" class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label asp-for="Street">Street:</label>
+                                        <input asp-for="Street" type="text" class="form-control form-control-lg" />
+                                        <span asp-validation-for="Street" class="text-danger"></span>
+                                    </div>
+                                </div>
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label asp-for="City">City:</label>
@@ -74,7 +84,8 @@
                                         <span asp-validation-for="Mileage" class="text-danger"></span>
                                     </div>
                                 </div>
-                                <div class="col-12">
+                                <br />
+                                <div class="col-12" style="margin-top: 10px">
                                     <div class="form-group">
                                         <button class="btn btn-primary" type="submit">Save changes</button>
                                     </div>
